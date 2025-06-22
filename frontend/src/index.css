@@ -1,0 +1,12 @@
+/* Added Roboto font to the entire website */
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apply Roboto font globally */
+body {
+  font-family: 'Roboto', sans-serif;
+  letter-spacing: 0.5px;
+}
