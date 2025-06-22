@@ -127,7 +127,7 @@ const Home = () => {
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 to="/user/dashboard"
-                className="inline-flex items-center justify-center rounded-md bg-white px-7 py-2.5 text-base font-semibold text-black shadow-lg border border-black/20 transition-transform duration-150 hover:shadow-white/60 hover:ring-2 hover:ring-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md bg-white px-7 py-2.5 text-base font-semibold text-black shadow-lg border border-black/20 transition-transform duration-150 hover:shadow-cyan-400/60 hover:ring-2 hover:ring-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
               >
                 View Dashboard
               </Link>

@@ -335,238 +335,266 @@ const AdminDeviceList = () => {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-white via-gray-100 to-cyan-50">
+      <div className="flex flex-col min-h-screen bg-gray-200">
         <NavbarComponent />
         <main className="flex-1 flex flex-col items-center px-4 py-6 w-full">
           <div className="w-full max-w-6xl flex flex-col items-center relative flex-1">
             {/* Glow is now a child of the card container */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[110%] h-[110%] rounded-3xl bg-cyan-200 blur-[80px] opacity-60" />
-            <div className="relative bg-white p-10 rounded-3xl shadow-2xl w-full flex flex-col items-center border border-black/10">
-              <h1 className="text-4xl font-extrabold mb-2 text-center text-black tracking-tight drop-shadow-lg">Admin Dashboard</h1>
-              {/* Glow underline for heading */}
-              <div className="relative flex justify-center w-full mb-8">
-                <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-48 h-2 rounded-full bg-cyan-400 blur-md opacity-80"></div>
-              </div>
-              <p className="text-black mb-2 text-lg">Welcome{adminEmail ? `, ${adminEmail}` : ', Admin'}!</p>
-              {/* Charts Section - original graphs, inside card */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
-                <div className="bg-white p-4 rounded-xl shadow border border-cyan-100">
-                  <h2 className="text-xl font-semibold mb-2 text-center text-black">Migration Status Overview</h2>
-                  <PieChart width={300} height={250} className="mx-auto">
-                    <Pie
-                      data={migrationStatusData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50} // This creates the donut hole
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    >
-                      <Cell fill="#fcd34d" /> {/* Pending */}
-                      <Cell fill="#fb923c" /> {/* Triggered */}
-                      <Cell fill="#4ade80" /> {/* Completed */}
-                    </Pie>
-                    <RechartsTooltip />
-                    <Legend />
-                  </PieChart>
-                </div>
-                <div className="bg-white p-4 rounded-xl shadow border border-cyan-100">
-                  <h2 className="text-xl font-semibold mb-2 text-center text-black">Eligibility Status</h2>
-                  <PieChart width={300} height={250} className="mx-auto">
-                    <Pie
-                      data={eligibleStats}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    >
-                      <Cell fill="#4ade80" /> {/* Eligible */}
-                      <Cell fill="#f87171" /> {/* Not Eligible */}
-                    </Pie>
-                    <RechartsTooltip />
-                    <Legend />
-                  </PieChart>
-                </div>
-                <div className="bg-white p-4 rounded-xl shadow border border-cyan-100">
-                  <h2 className="text-xl font-semibold mb-2 text-center text-black">Devices by OS</h2>
-                  <PieChart width={300} height={250} className="mx-auto">
-                    <Pie
-                      data={osData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    >
-                      {osData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={["#60a5fa", "#a78bfa", "#fcd34d", "#fca5a5"][index % 4]} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip />
-                    <Legend />
-                  </PieChart>
-                </div>
-              </div>
-              {/* Progress Bar Overlay - moved outside table */}
-              {isLoading && (
-                <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-[9999]">
-                  <div className="flex flex-col items-center w-[70vw]">
-                    <Progress value={progress} size="md" label="Completed..." className="w-full" />
-                    <Typography variant="small" className="mt-2 text-white">
-                      Loading, please wait...
-                    </Typography>
+            {/* Login-style border wrapper start */}
+            <div className="rounded-2xl p-[3px] bg-black w-full">
+              <div className="rounded-2xl p-[3px] bg-gradient-to-br from-cyan-400/80 to-transparent w-full">
+                <div className="relative bg-gray-300 p-10 rounded-3xl shadow-2xl w-full flex flex-col items-center border border-black/10">
+                  <div className="relative w-full flex flex-col items-center mb-8">
+                    <h1 className="text-4xl font-extrabold mb-2 text-center text-black tracking-tight drop-shadow-[0_2px_16px_rgba(34,211,238,0.7)]">
+                      Admin Dashboard
+                    </h1>
+                    <p className="text-black mb-2 text-lg">Welcome{adminEmail ? `, ${adminEmail}` : ', Admin'}!</p>
                   </div>
-                </div>
-              )}
-              {/* Device Table */}
-              <Card className="w-full mt-2 bg-white rounded-xl shadow border border-cyan-100 flex flex-col">
-                <CardHeader floated={false} shadow={false} className="rounded-none bg-white border-b border-cyan-100">
-                  <div className="mb-4 flex items-center justify-between gap-8">
-                    <div>
-                      <Typography variant="h5" className="text-black font-bold">
-                        Device List
-                      </Typography>
-                      <Typography className="mt-1 font-normal text-gray-600">
-                        Manage all your devices
-                      </Typography>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-                    <Tabs value={activeTab} className="w-full md:w-max">
-                      <TabsHeader>
-                        {TABS.map(({ label, value }) => (
-                          <Tab
-                            key={value}
-                            value={value}
-                            onClick={() => handleTabChange(value)}
-                            className={value === activeTab ? 'text-cyan-600 font-bold' : 'text-black'}
-                          >
-                            &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                          </Tab>
-                        ))}
-                      </TabsHeader>
-                    </Tabs>
-                    <div className="w-full md:w-72">
-                      <Input
-                        label="Search by Email"
-                        icon={<MagnifyingGlassIcon className="h-5 w-5 text-cyan-500" />}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="text-black"
-                      />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardBody className="overflow-y-auto px-0 pt-0 bg-white relative" style={{ maxHeight: '60vh' }}>
-                  <table className="w-full min-w-max table-auto text-left">
-                    <thead className="sticky top-0 bg-cyan-50 z-10">
-                      <tr>
-                        {TABLE_HEAD.map((head, index) => (
-                          <th
-                            key={head + index}
-                            className="border-y border-cyan-100 bg-cyan-50 p-4 text-black"
-                          >
-                            <Typography
-                              variant="small"
-                              className="font-bold text-black"
+                  {/* Charts Section - original graphs, inside card */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
+                    {/* Migration Status Overview Chart with thin border */}
+                    <div className="rounded-xl p-[1.5px] bg-black w-full">
+                      <div className="rounded-xl p-[1.5px] bg-gradient-to-br from-cyan-400/80 to-transparent w-full">
+                        <div className="bg-gray-100 p-4 rounded-xl shadow border border-cyan-100">
+                          <h2 className="text-xl font-semibold mb-2 text-center text-black">Migration Status Overview</h2>
+                          <PieChart width={300} height={250} className="mx-auto">
+                            <Pie
+                              data={migrationStatusData}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50} // This creates the donut hole
+                              outerRadius={80}
+                              fill="#8884d8"
+                              label
                             >
-                              {head}
-                            </Typography>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredDevices.map(
-                        (device, index) => {
-                          const isLast = index === filteredDevices.length - 1;
-                          const classes = isLast
-                            ? "p-4 bg-white"
-                            : "p-4 border-b border-cyan-100 bg-white";
-                          return (
-                            <tr key={device.deviceId}>
-                              {/* Column 1: Device ID & User Email */}
-                              <td className={classes}>
-                                <div className="flex items-center gap-3">
-                                  <div className="flex flex-col">
-                                    <div className="flex items-center gap-2">
-                                      <Typography
-                                        variant="small"
-                                        className="font-normal text-black"
-                                      >
-                                        {device.deviceId}
-                                      </Typography>
-                                      <Chip
-                                        variant="ghost"
-                                        size="sm"
-                                        value={device.os_version || "Unknown OS"}
-                                        color="cyan"
-                                      />
-                                    </div>
+                              <Cell fill="#fcd34d" /> {/* Pending */}
+                              <Cell fill="#fb923c" /> {/* Triggered */}
+                              <Cell fill="#4ade80" /> {/* Completed */}
+                            </Pie>
+                            <RechartsTooltip />
+                            <Legend />
+                          </PieChart>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Eligibility Status Chart with thin border */}
+                    <div className="rounded-xl p-[1.5px] bg-black w-full">
+                      <div className="rounded-xl p-[1.5px] bg-gradient-to-br from-cyan-400/80 to-transparent w-full">
+                        <div className="bg-gray-100 p-4 rounded-xl shadow border border-cyan-100">
+                          <h2 className="text-xl font-semibold mb-2 text-center text-black">Eligibility Status</h2>
+                          <PieChart width={300} height={250} className="mx-auto">
+                            <Pie
+                              data={eligibleStats}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              fill="#8884d8"
+                              label
+                            >
+                              <Cell fill="#4ade80" /> {/* Eligible */}
+                              <Cell fill="#f87171" /> {/* Not Eligible */}
+                            </Pie>
+                            <RechartsTooltip />
+                            <Legend />
+                          </PieChart>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Devices by OS Chart with thin border */}
+                    <div className="rounded-xl p-[1.5px] bg-black w-full">
+                      <div className="rounded-xl p-[1.5px] bg-gradient-to-br from-cyan-400/80 to-transparent w-full">
+                        <div className="bg-gray-100 p-4 rounded-xl shadow border border-cyan-100">
+                          <h2 className="text-xl font-semibold mb-2 text-center text-black">Devices by OS</h2>
+                          <PieChart width={300} height={250} className="mx-auto">
+                            <Pie
+                              data={osData}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              fill="#8884d8"
+                              label
+                            >
+                              {osData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={["#60a5fa", "#a78bfa", "#fcd34d", "#fca5a5"][index % 4]} />
+                              ))}
+                            </Pie>
+                            <RechartsTooltip />
+                            <Legend />
+                          </PieChart>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Progress Bar Overlay - moved outside table */}
+                  {isLoading && (
+                    <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-[9999]">
+                      <div className="flex flex-col items-center w-[70vw]">
+                        <Progress value={progress} size="md" label="Completed..." className="w-full" />
+                        <Typography variant="small" className="mt-2 text-white">
+                          Loading, please wait...
+                        </Typography>
+                      </div>
+                    </div>
+                  )}
+                  {/* Device Table with graph-style border */}
+                  <div className="rounded-xl p-[1.5px] bg-black w-full">
+                    <div className="rounded-xl p-[1.5px] bg-gradient-to-br from-cyan-400/80 to-transparent w-full">
+                      <Card className="w-full bg-gray-100 rounded-xl shadow border border-cyan-100 flex flex-col">
+                        <CardHeader floated={false} shadow={false} className="rounded-none bg-gray-100 border-b border-cyan-100">
+                          <div className="mb-4 flex items-center justify-between gap-8">
+                            <div>
+                              <Typography variant="h5" className="text-black font-bold">
+                                Device List
+                              </Typography>
+                              <Typography className="mt-1 font-normal text-gray-700">
+                                Manage all your devices
+                              </Typography>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-center justify-between gap-4 md:flex-row mb-2">
+                            <Tabs value={activeTab} className="w-full md:w-max">
+                              <TabsHeader className="bg-gray-300">
+                                {TABS.map(({ label, value }) => (
+                                  <Tab
+                                    key={value}
+                                    value={value}
+                                    onClick={() => handleTabChange(value)}
+                                    className={value === activeTab ? 'text-cyan-600 font-bold' : 'text-black'}
+                                  >
+                                    &nbsp;&nbsp;{label}&nbsp;&nbsp;
+                                  </Tab>
+                                ))}
+                              </TabsHeader>
+                            </Tabs>
+                            <div className="w-full md:w-72">
+                              <Input
+                                label="Search by Email"
+                                icon={<MagnifyingGlassIcon className="h-5 w-5 text-cyan-500" />}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="text-black border-gray-700"
+                              />
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardBody className="overflow-y-auto px-0 pt-0 bg-gray-100 relative" style={{ maxHeight: '60vh' }}>
+                          <table className="w-full min-w-max table-auto text-left">
+                            <thead className="sticky top-0 bg-cyan-50 z-10">
+                              <tr>
+                                {TABLE_HEAD.map((head, index) => (
+                                  <th
+                                    key={head + index}
+                                    className="border-y border-cyan-100 bg-cyan-50 p-4 text-black"
+                                  >
                                     <Typography
                                       variant="small"
-                                      className="font-normal text-gray-500"
+                                      className="font-bold text-black"
                                     >
-                                      {device.User?.email || 'N/A'}
+                                      {head}
                                     </Typography>
-                                  </div>
-                                </div>
-                              </td>
-                              {/* Column 2: Department & Location */}
-                              <td className={classes}>
-                                <div className="flex flex-col">
-                                  <Typography
-                                    variant="small"
-                                    className="font-normal text-black"
-                                  >
-                                    {device.User?.department || 'N/A'}
-                                  </Typography>
-                                  <Typography
-                                    variant="small"
-                                    className="font-normal text-gray-500"
-                                  >
-                                    {device.User?.location || 'N/A'}
-                                  </Typography>
-                                </div>
-                              </td>
-                              {/* Column 3: Status (Eligible/Not Eligible) */}
-                              <td className={classes}>
-                                <div className="flex flex-col items-start gap-1">
-                                  <Chip
-                                    variant="ghost"
-                                    size="sm"
-                                    value={device.isEligible ? "Eligible" : "Not Eligible"}
-                                    color={device.isEligible ? "green" : "red"}
-                                  />
-                                </div>
-                              </td>
-                              {/* Column 4: Migration Status */}
-                              <td className={classes}>
-                                <Typography
-                                  variant="small"
-                                  className="font-normal text-black"
-                                >
-                                  {renderMigrationStatus(device)}
-                                </Typography>
-                              </td>
-                              {/* Column 5: Action (Trigger Migration)*/}
-                              <td className={classes}>{renderActionMenu(device)}</td>
-                            </tr>
-                          );
-                        },
-                      )}
-                    </tbody>
-                  </table>
-                </CardBody>
-              </Card>
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredDevices.map(
+                                (device, index) => {
+                                  const isLast = index === filteredDevices.length - 1;
+                                  const tdClasses = isLast
+                                    ? "p-4"
+                                    : "p-4 border-b border-cyan-100";
+                                  return (
+                                    <tr
+                                      key={device.deviceId}
+                                      className="hover:bg-white bg-gray-200 transition-colors duration-200 group"
+                                    >
+                                      {/* Column 1: Device ID & User Email */}
+                                      <td className={tdClasses + " group-hover:bg-transparent bg-transparent"}>
+                                        <div className="flex items-center gap-3">
+                                          <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                              <Typography
+                                                variant="small"
+                                                className="font-normal text-black"
+                                              >
+                                                {device.deviceId}
+                                              </Typography>
+                                              <Chip
+                                                variant="ghost"
+                                                size="sm"
+                                                value={device.os_version || "Unknown OS"}
+                                                color="cyan"
+                                              />
+                                            </div>
+                                            <Typography
+                                              variant="small"
+                                              className="font-normal text-gray-500"
+                                            >
+                                              {device.User?.email || 'N/A'}
+                                            </Typography>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      {/* Column 2: Department & Location */}
+                                      <td className={tdClasses + " group-hover:bg-transparent bg-transparent"}>
+                                        <div className="flex flex-col">
+                                          <Typography
+                                            variant="small"
+                                            className="font-normal text-black"
+                                          >
+                                            {device.User?.department || 'N/A'}
+                                          </Typography>
+                                          <Typography
+                                            variant="small"
+                                            className="font-normal text-gray-500"
+                                          >
+                                            {device.User?.location || 'N/A'}
+                                          </Typography>
+                                        </div>
+                                      </td>
+                                      {/* Column 3: Status (Eligible/Not Eligible) */}
+                                      <td className={tdClasses + " group-hover:bg-transparent bg-transparent"}>
+                                        <div className="flex flex-col items-start gap-1">
+                                          <Chip
+                                            variant="ghost"
+                                            size="sm"
+                                            value={device.isEligible ? "Eligible" : "Not Eligible"}
+                                            color={device.isEligible ? "green" : "red"}
+                                          />
+                                        </div>
+                                      </td>
+                                      {/* Column 4: Migration Status */}
+                                      <td className={tdClasses + " group-hover:bg-transparent bg-transparent"}>
+                                        <Typography
+                                          variant="small"
+                                          className="font-normal text-black"
+                                        >
+                                          {renderMigrationStatus(device)}
+                                        </Typography>
+                                      </td>
+                                      {/* Column 5: Action (Trigger Migration)*/}
+                                      <td className={tdClasses + " group-hover:bg-transparent bg-transparent"}>{renderActionMenu(device)}</td>
+                                    </tr>
+                                  );
+                                },
+                              )}
+                            </tbody>
+                          </table>
+                        </CardBody>
+                      </Card>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            {/* Login-style border wrapper end */}
           </div>
         </main>
         <Footer />
