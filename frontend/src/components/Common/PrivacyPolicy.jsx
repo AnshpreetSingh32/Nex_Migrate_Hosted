@@ -80,14 +80,14 @@ const Privacypolicy = () => (
   <>
     <NavbarComponent />
     <ParticlesBackground />
-    <div className="relative min-h-screen w-full bg-gradient-to-b from-black via-cyan-400 via-30% via-white via-70% via-cyan-400 to-black text-white py-16 px-4 flex flex-col items-center overflow-x-hidden">
+    <div className="min-h-screen w-full py-16 px-4 flex flex-col items-center overflow-x-hidden">
       <motion.div
         className="max-w-2xl w-full text-center mb-12 z-10"
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-white tracking-tight drop-shadow-lg">Privacy Policy</h1>
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-white drop-shadow-lg">Privacy Policy</h1>
         <p className="text-lg md:text-xl text-cyan-100 font-medium">
           Your privacy and data security are our top priorities at Nex-Migrate.
         </p>

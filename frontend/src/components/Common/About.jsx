@@ -106,7 +106,7 @@ const timelineData = [
 ];
 
 const Timeline = () => (
-  <div className="relative max-w-3xl mx-auto py-16">
+  <div className="relative max-w-3xl mx-auto py-16 z-10">
     {/* Vertical line */}
     <div className="absolute left-1/2 top-0 h-full w-1 bg-cyan-400/30 -translate-x-1/2 z-0" />
     <div className="flex flex-col gap-16 relative z-10">
@@ -151,7 +151,7 @@ const AboutPage = () => (
   <>
     <NavbarComponent />
     <ParticlesBackground />
-    <div className="min-h-screen w-full bg-gradient-to-b from-black via-cyan-400 via-30% via-white via-70% via-cyan-400 to-black">
+    <div className="min-h-screen w-full">
       <Timeline />
       <Footer />
     </div>

@@ -2,7 +2,7 @@ import { ShieldCheck } from 'iconoir-react';
 // Footer component styled to match the provided design and fix floating issue
 const Footer = () => {
   return (
-    <footer className="w-full bg-black text-white py-1 border-t-2 border-cyan-400/40 mt-auto">
+    <footer className="w-full bg-black text-white py-1 border-t-2 border-cyan-400/40 mt-auto relative z-50">
       {/* Glowing top border accent */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-cyan-400/40 blur-lg pointer-events-none z-10" />
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 gap-4 w-full relative">

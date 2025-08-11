@@ -115,7 +115,7 @@ const Home = () => {
           <motion.p className="relative z-10 text-lg md:text-xl mb-8 text-black/80">
             Effortless device readiness, smart migration triggers, and seamless user experience.
           </motion.p>
-          <motion.div className="flex justify-center gap-4 relative z-10" initial="hidden" animate="visible" variants={stagger}>
+          <motion.div className="flex justify-center gap-4 relative" initial="hidden" animate="visible" variants={stagger}>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 to="/login-user"
@@ -137,7 +137,7 @@ const Home = () => {
       </div>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white text-center">
+      <section className="relative py-20 px-4 bg-white text-center">
         <motion.h2
           className="text-4xl md:text-5xl font-extrabold mb-4 text-black"
           initial="hidden"
@@ -157,7 +157,7 @@ const Home = () => {
             <Popover key={idx}>
               <PopoverHandler>
                 <motion.div
-                  className="relative bg-black border border-cyan-400/40 shadow-lg rounded-2xl px-7 py-10 flex flex-col items-center justify-center text-white overflow-hidden group"
+                  className="relative bg-black border border-cyan-400/40 shadow-lg rounded-2xl px-7 py-10 flex flex-col items-center justify-center text-white overflow-hidden group "
                   initial={{ opacity: 0, scale: 0.92 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.16, delay: idx * 0.06, type: 'spring', stiffness: 800, damping: 38 }}
@@ -271,7 +271,7 @@ const Home = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-4 bg-white text-center">
+      <section className="relative py-20 px-4 bg-white text-center z-20">
         <motion.h2
           className="text-4xl md:text-5xl font-extrabold mb-4 text-black"
           initial="hidden"

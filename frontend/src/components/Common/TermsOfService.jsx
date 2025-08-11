@@ -2,6 +2,7 @@ import NavbarComponent from './Navbar';
 import Footer from './Footer';
 import { motion } from 'framer-motion';
 import { InfoCircle, Shield, UserBadgeCheck, WarningTriangle, Copyright } from 'iconoir-react';
+import ParticlesBackground from './ParticlesBackground';
 
 const sections = [
   {
@@ -62,14 +63,15 @@ const sections = [
 const TermsOfService = () => (
   <>
     <NavbarComponent />
-    <div className="relative min-h-screen w-full bg-gradient-to-b from-black via-cyan-400 via-30% via-white via-70% via-cyan-400 to-black text-white py-16 px-4 flex flex-col items-center">
+    <ParticlesBackground />
+    <div className="relative min-h-screen w-full py-16 px-4 flex flex-col items-center">
       <motion.div
         className="max-w-2xl w-full text-center mb-12"
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-white tracking-tight drop-shadow-lg">Terms of Service</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">Terms of Service</h1>
         <p className="text-lg md:text-xl text-cyan-100 font-medium">
           Please review the following terms and conditions before using Nex-Migrate.
         </p>
@@ -79,7 +81,7 @@ const TermsOfService = () => (
         {sections.map((section, idx) => (
           <motion.div
             key={section.title}
-            className="bg-black/80 border border-cyan-400/30 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center relative overflow-hidden"
+            className="bg-black border border-cyan-400/30 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center relative overflow-hidden"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}

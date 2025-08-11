@@ -149,7 +149,7 @@ const NavbarComponent = ({ children }) => {
             as="a"
             href="/"
             variant="h6"
-            className="mr-4 cursor-pointer py-1.5 text-white flex items-center font-extrabold text-xl tracking-tight"
+            className="mr-4 cursor-pointer py-1.5 text-white flex items-center font-extrabold text-xl"
           >
             <img src={logo} alt="Logo" className="ml-2 h-9 w-20 mr-2" />
             Device Migration Portal

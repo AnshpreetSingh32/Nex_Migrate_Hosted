@@ -120,7 +120,7 @@ const UserDashboard = () => {
             {/* Glow is now a child of the card container */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[110%] h-[100%] rounded-3xl bg-cyan-200 blur-[80px] opacity-60" />
             <div className="relative bg-white p-10 rounded-3xl shadow-2xl w-full flex flex-col items-center border border-black/10">
-              <h1 className="text-4xl font-extrabold mb-2 text-center text-black tracking-tight drop-shadow-lg">User Dashboard</h1>
+              <h1 className="text-4xl font-extrabold mb-2 text-center text-black drop-shadow-lg">User Dashboard</h1>
               {/* Glow underline for heading */}
               <div className="relative flex justify-center w-full mb-8">
                 <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-48 h-2 rounded-full bg-cyan-400 blur-md opacity-80"></div>
@@ -130,7 +130,7 @@ const UserDashboard = () => {
                   {/* Glow behind card */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[105%] h-full rounded-2xl bg-cyan-200 blur-[60px] opacity-60" />
                   <div className="relative bg-white p-8 rounded-2xl shadow-xl border border-cyan-100 w-full max-w-2xl">
-                    <h2 className="text-2xl font-semibold mb-6 text-center text-black tracking-tight">Device Information</h2>
+                    <h2 className="text-2xl font-semibold mb-6 text-center text-black">Device Information</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="flex items-center gap-3">
                         <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-cyan-50 text-cyan-600">
