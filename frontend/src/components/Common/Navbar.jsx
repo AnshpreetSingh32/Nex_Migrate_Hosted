@@ -134,16 +134,16 @@ const NavbarComponent = ({ children }) => {
       <style>
         {`
           :root {
-            --navbar-height: 56px; /* Adjust this value based on the actual height of the navbar */
+            --navbar-height: 53px; /* Adjust this value based on the actual height of the navbar */
           }
         `}
       </style>
       <Navbar
-        className="max-w-full fixed top-0 left-0 z-50 bg-black text-white shadow-lg right-0 p-0 lg:px-10 border-b border-white/10 overflow-visible"
+        className="max-w-full fixed top-0 left-0 z-50 bg-black text-white shadow-lg right-0 p-0 lg:px-1 border-b border-white/10 overflow-visible"
         style={{ height: "var(--navbar-height)", borderRadius: "0", backgroundColor: "#000" }}
       >
         {/* Glowing bottom border accent */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-2 bg-cyan-400/40 blur-lg pointer-events-none z-10" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-1 bg-cyan-300 blur-lg pointer-events-none z-10" />
         <div className="relative flex items-center justify-between w-full">
           <Typography
             as="a"
@@ -167,7 +167,7 @@ const NavbarComponent = ({ children }) => {
             } catch (e) {}
             if (Boolean(localStorage.getItem("token")) && (userRole === 'admin' || userRole === 'user')) {
               return (
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden xl:block">
                   <Tooltip content={`Logged in as ${userEmail || ''}`} animate={{ mount: { scale: 1, y: 0 }, unmount: { scale: 0, y: 25 } }} placement="bottom">
                     <span>
                       <MTButton
@@ -188,7 +188,7 @@ const NavbarComponent = ({ children }) => {
             }
             return null;
           })()}
-          <div className="hidden lg:flex gap-6 items-center">
+          <div className="hidden xl:flex gap-6 items-center">
             <NavList isHomePage={isHomePage} isLoggedIn={isLoggedIn} />
             {/* Only show logout if logged in */}
             {isLoggedIn && (
@@ -215,7 +215,7 @@ const NavbarComponent = ({ children }) => {
           </div>
           <IconButton
             variant="text"
-            className="ml-auto h-6 w-6 text-white hover:bg-cyan-400/10 focus:bg-cyan-400/10 active:bg-cyan-400/20 transition-colors lg:hidden"
+            className="ml-auto h-6 w-6 text-white hover:bg-cyan-400/10 focus:bg-cyan-400/10 active:bg-cyan-400/20 transition-colors xl:hidden"
             ripple={false}
             onClick={() => setOpenNav(!openNav)}
           >
@@ -226,29 +226,71 @@ const NavbarComponent = ({ children }) => {
             )}
           </IconButton>
         </div>
-        <Collapse open={openNav} className="bg-black text-white border-t border-cyan-400/20">
+        <Collapse open={openNav} className="bg-black text-white">
+          {/* Dashboard button for mobile/medium screens */}
+          {(() => {
+            const userRole = getUserRole();
+            let userEmail = null;
+            try {
+              const token = localStorage.getItem('token');
+              if (token) {
+                const decoded = jwtDecode(token);
+                userEmail = decoded.email;
+              }
+            } catch (e) {}
+            if (Boolean(localStorage.getItem("token")) && (userRole === 'admin' || userRole === 'user')) {
+              return (
+                <Typography
+                  as="li"
+                  variant="small"
+                  color="blue-gray"
+                  className="p-1 font-medium xl:hidden"
+                >
+                  <Tooltip content={`Logged in as ${userEmail || ''}`} animate={{ mount: { scale: 1, y: 0 }, unmount: { scale: 0, y: 25 } }} placement="bottom">
+                    <span>
+                      <MTButton
+                        color="cyan"
+                        className="inline-flex items-center justify-center px-6 py-2 text-base font-semibold border border-cyan-600 rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 shadow bg-cyan-600 hover:bg-cyan-700"
+                        style={{ minWidth: '150px' }}
+                        onClick={() => {
+                          if (userRole === 'admin' && window.location.pathname !== '/admin/dashboard') window.location.assign('/admin/dashboard');
+                          if (userRole === 'user' && window.location.pathname !== '/user/dashboard') window.location.assign('/user/dashboard');
+                        }}
+                      >
+                        {userRole === 'admin' ? 'Go to Admin Dashboard' : 'Go to User Dashboard'}
+                      </MTButton>
+                    </span>
+                  </Tooltip>
+                </Typography>
+              );
+            }
+            return null;
+          })()}
           <NavList isHomePage={isHomePage} isLoggedIn={isLoggedIn} />
           {/* Only show logout if logged in (mobile) */}
           {isLoggedIn && (
-            <Typography
-              as="li"
-              variant="small"
-              color="blue-gray"
-              className="p-1 font-medium"
-            >
-              <button
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  toast.success('Logged out successfully!');
-                  setTimeout(() => {
-                    window.location.assign("/login-user");
-                  }, 500);
-                }}
-                className="inline-flex items-center justify-center rounded-md bg-black px-6 py-2 text-base font-semibold text-red-500 border border-red-400 transition-all duration-150 hover:scale-105 hover:border-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+            <>
+              <Typography
+                as="li"
+                variant="small"
+                color="blue-gray"
+                className="p-1 font-medium"
               >
-                Logout
-              </button>
-            </Typography>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    toast.success('Logged out successfully!');
+                    setTimeout(() => {
+                      window.location.assign("/login-user");
+                    }, 500);
+                  }}
+                  className="inline-flex items-center justify-center rounded-md bg-black px-6 py-2 text-base font-semibold text-red-500 border border-red-400 transition-all duration-150 hover:scale-105 hover:border-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+                >
+                  Logout
+                </button>
+              </Typography>
+
+            </>
           )}
         </Collapse>
       </Navbar>

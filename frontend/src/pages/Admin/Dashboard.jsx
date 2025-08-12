@@ -480,15 +480,15 @@ const AdminDeviceList = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardBody className="overflow-y-auto px-0 pt-0 bg-gray-100 relative" style={{ maxHeight: '60vh' }}>
+              <CardBody className="overflow-y-auto px-0 pt-0 bg-gray-100 " style={{ maxHeight: '60vh' }}>
                 <div className="w-full overflow-x-auto">
                   <table className="w-full min-w-[700px] table-auto text-left">
-                    <thead className="sticky top-0 bg-cyan-50 z-10">
+                    <thead className="top-0 bg-cyan-200">
                       <tr>
                         {TABLE_HEAD.map((head, index) => (
                           <th
                             key={head + index}
-                            className="bg-cyan-50 p-4 text-black"
+                            className="p-4"
                           >
                             <Typography
                               variant="small"
@@ -521,7 +521,7 @@ const AdminDeviceList = () => {
                                         variant="small"
                                         className="font-normal text-black"
                                       >
-                                        {device.deviceId}
+                                        {device.device_name}
                                       </Typography>
                                       <Chip
                                         variant="ghost"
