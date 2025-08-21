@@ -492,7 +492,7 @@ const AdminDeviceList = () => {
                           >
                             <Typography
                               variant="small"
-                              className="font-bold text-black"
+                              className="font-bold text-black text-base"
                             >
                               {head}
                             </Typography>
