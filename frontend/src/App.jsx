@@ -2,9 +2,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginAdmin from './pages/LoginAdmin';
 import LoginUser from './pages/LoginUser';
 import UserDashboard from './pages/User/Dashboard';
+import DemoUserDashboard from './pages/User/DemoDashboard';
 import Home from './pages/Home';
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import AdminDeviceList from './pages/Admin/Dashboard';
+import DemoDashboard from './pages/Admin/DemoDashboard';
 import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AboutPage from './components/Common/About';
@@ -23,18 +25,20 @@ function App() {
               <AdminDeviceList />
             </ProtectedRoute>
           } />
+        <Route path="/admin/demo-dashboard" element={<DemoDashboard />} />
         <Route path="/user/dashboard" element={
             <ProtectedRoute role="user">
               <UserDashboard />
             </ProtectedRoute>
           } />
+        <Route path="/user/demo-dashboard" element={<DemoUserDashboard />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/privacy-policy" element={<Privacypolicy />} />
         <Route path="*" element={<div>404 Not Found</div>} />
 
       </Routes>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar theme="colored" transition={Slide} />
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar theme="colored" transition={Slide} />
     </BrowserRouter>
   );
 }

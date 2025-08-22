@@ -1,15 +1,15 @@
 import { useEffect, useState, useMemo } from 'react';
-import axios from '../../api/axios'; // Ensure this path is correct
-import { getToken } from '../../utils/auth'; // Ensure this path is correct
-import NavbarComponent from '../../components/Common/Navbar'; // Ensure this path is correct
-import Footer from '../../components/Common/Footer'; // Ensure this path is correct
-import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend } from 'recharts'; // Renamed Recharts' Tooltip
+import axios from '../../api/axios';
+import { getToken } from '../../utils/auth';
+import NavbarComponent from '../../components/Common/Navbar';
+import Footer from '../../components/Common/Footer';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import { ResponsiveContainer } from 'recharts';
 import { Progress } from "@material-tailwind/react";
-import ProtectedRoute from '../../components/Common/ProtectedRoute';
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 // Material Tailwind and Heroicons imports
 import {
@@ -29,7 +29,7 @@ import {
   TabsHeader,
   Tab,
   IconButton,
-  Tooltip, // Material Tailwind's Tooltip
+  Tooltip,
   Menu,
   MenuHandler,
   MenuList,
@@ -56,43 +56,41 @@ const TABS = [
   },
 ];
 
-// Updated TABLE_HEAD as per your design
 const TABLE_HEAD = ["Device", "Department", "Status", "Migration", "Action"];
 
-const AdminDeviceList = () => {
+const DemoAdminDashboard = () => {
   const [devices, setDevices] = useState([]);
   const [eligibleStats, setEligibleStats] = useState([]);
   const [osData, setOsData] = useState([]);
   const [migrationStatusData, setMigrationStatusData] = useState([]);
-  const [activeTab, setActiveTab] = useState("all"); // State to track active tab
+  const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0); // State for progress bar
+  const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
 
-  // Get admin email from token
+  // Get admin email from demo token
   let adminEmail = '';
-  let adminId = '';
   try {
     const token = getToken();
     if (token) {
       const decoded = jwtDecode(token);
-      adminEmail = decoded.email || '';
-      adminId = decoded.adminId || '';
-
+      adminEmail = decoded.email || 'Demo Admin';
     }
-  } catch (e) { }
+  } catch (e) {
+    console.error('Error decoding token:', e);
+  }
 
   const fetchDevices = async () => {
     try {
-      const res = await axios.get('/admin/devices', {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      });
+      // Use demo API instead of real API
+      const res = await axios.get('/demo/admin/devices');
       setDevices(res.data);
 
       // Eligible vs Not Eligible
       const eligibleProcessed = [
         { name: 'Eligible', value: res.data.filter(d => d.isEligible).length },
-        { name: 'NotEligible', value: res.data.filter(d => !d.isEligible).length }
+        { name: 'Not Eligible', value: res.data.filter(d => !d.isEligible).length }
       ];
       setEligibleStats(eligibleProcessed);
 
@@ -109,7 +107,7 @@ const AdminDeviceList = () => {
       setOsData(osProcessed);
 
     } catch (err) {
-      console.error('Failed to fetch devices:', err);
+      console.error('Failed to fetch demo devices:', err);
     }
   };
 
@@ -118,27 +116,24 @@ const AdminDeviceList = () => {
   }, []);
 
   useEffect(() => {
-    const fetchMigrationStatus = async () => {
-      try {
-        const response = await axios.get('/admin/migration-status');
-        setMigrationStatusData(response.data.data);
-      } catch (error) {
-        console.error('Error fetching migration status data:', error);
-      }
-    };
-
-    fetchMigrationStatus();
+    // Mock migration status data for demo
+    const mockMigrationStatus = [
+      { name: 'Pending', value: 6 },
+      { name: 'Triggered', value: 1 },
+      { name: 'Completed', value: 1 }
+    ];
+    setMigrationStatusData(mockMigrationStatus);
   }, []);
 
-  // Revert the migration field update logic to show 'Triggered' immediately
+  // Demo version of trigger migration - shows demo message
   const triggerMigration = async (deviceId) => {
     try {
       setDevices(prevDevices => prevDevices.map(device =>
         device.deviceId === deviceId ? { ...device, migration: 'Triggered' } : device
       ));
 
-      setIsLoading(true); // Show loading screen
-      setProgress(0); // Reset progress bar
+      setIsLoading(true);
+      setProgress(0);
 
       // Smooth progress bar increment
       const interval = setInterval(() => {
@@ -147,75 +142,59 @@ const AdminDeviceList = () => {
             clearInterval(interval);
             return 100;
           }
-          return prev + 1; // Increment progress by 1% every 100ms for smoothness
+          return prev + 1;
         });
       }, 100);
 
-      // Simulate a 10-second delay for loading
+      // Simulate a 5-second delay for demo
       setTimeout(async () => {
-        // Existing call to trigger migration
-        await axios.post(`/admin/trigger-migration/${deviceId}`, {},
-          {
-            headers: { Authorization: `Bearer ${getToken()}` },
-          },
-        );
+        // Show demo success message
+        toast.success('Demo: Migration triggered successfully! (This is demo mode - no real migration occurred)');
+        
+        // Update device status to show it was "migrated"
+        setDevices(prevDevices => prevDevices.map(device =>
+          device.deviceId === deviceId 
+            ? { 
+                ...device, 
+                status: 'Migrated', 
+                migrationTriggered: true, 
+                isEligible: false,
+                os_version: 'Win11'
+              } 
+            : device
+        ));
 
-        // ***** NEW: Call to log the migration trigger *****
-        try {
-          await axios.post('/admin/migrate-log', { deviceId }, {
-            headers: { Authorization: `Bearer ${getToken()}` }
-          });
-          // Optionally, add a success toast or log for this action
-          toast.success('Migration log registered successfully!');
-          // console.log('Migration log registered for device:', deviceId);
-        } catch (logError) {
-          console.error('Failed to register migration log:', logError);
-          // Optionally, inform the user if logging fails, though the main migration might still proceed
-          toast.error('Failed to register migration log.');
-        }
-        // ***** END NEW *****
-
-        // Fetch updated devices to reflect 'Completed' status (or other statuses)
-        await fetchDevices();
-        setIsLoading(false); // Hide loading screen
-      }, 10000); // 10 seconds delay
+        setIsLoading(false);
+      }, 5000); // 5 seconds for demo
     } catch (err) {
-      console.error('Migration failed:', err);
-      setIsLoading(false); // Stop loading in case of error
+      console.error('Demo migration failed:', err);
+      setIsLoading(false);
     }
   };
 
-  // Send Email function for Needs Review devices
+  // Demo version of send email - shows demo message
   const sendEmail = async (deviceId) => {
     try {
-      await axios.post('/admin/send-email', { deviceId, adminId }, {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      }).then(res => {
-        toast.success(res.data.message || 'Email sent successfully!');
-      }).catch(err => {
-        toast.error(
-          err.response?.data?.message || 'Failed to send email. Please try again.'
-        );
-      });
+      toast.success('Demo: Email sent successfully! (This is demo mode - no real email was sent)');
     } catch (err) {
-      toast.error('Failed to send email. Please try again.');
+      toast.error('Demo: Failed to send email.');
     }
   };
 
+  // Demo version of generate service request - shows demo message
   const generateServiceRequest = async (device) => {
     try {
-      const response = await axios.post('/admin/servicenow', { device }, {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      });
-      toast.success(response.data.message || 'ServiceNow request created successfully!');
-      // Optionally, you might want to refresh device data or update UI state here
-      // await fetchDevices(); 
+      toast.success('Demo: ServiceNow request created successfully! (This is demo mode - no real request was created)');
     } catch (err) {
-      console.error('Error creating ServiceNow request:', err);
-      toast.error(
-        err.response?.data?.message || 'Failed to create ServiceNow request. Please try again.'
-      );
+      console.error('Error creating demo ServiceNow request:', err);
+      toast.error('Demo: Failed to create ServiceNow request.');
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login-admin');
+    toast.success('Logged out from demo mode');
   };
 
   const handleTabChange = (value) => {
@@ -246,11 +225,11 @@ const AdminDeviceList = () => {
 
     return (
       <Menu>
-        <Tooltip content="Open Migration Menu">
+        <Tooltip content="Open Migration Menu (Demo Mode)">
           <MenuHandler>
             <IconButton
               variant="text"
-              disabled={isMigrated} // Disable the entire menu if the device is migrated
+              disabled={isMigrated}
             >
               <SquaresPlusIcon className="h-6 w-6 text-blue-gray-800 transition-transform duration-300 ease-in-out hover:scale-110 hover:animate-bounce" />
             </IconButton>
@@ -261,19 +240,19 @@ const AdminDeviceList = () => {
           <Tooltip
             content={
               isEligibleWindows10
-                ? "Device is marked 'Ready' and is currently on Windows 10 — eligible for migration."
-                : "Migration not allowed — device is either not 'Ready' or not running Windows 10."
+                ? "Demo: Device is marked 'Ready' and is currently on Windows 10 — eligible for migration."
+                : "Demo: Migration not allowed — device is either not 'Ready' or not running Windows 10."
             }
             placement="left"
             className="bg-black text-white"
           >
-            <span> {/* Wrapper for tooltip on disabled item */}
+            <span>
               <MenuItem
                 onClick={() => triggerMigration(device.deviceId)}
                 className={isEligibleWindows10 ? "" : "menu-disabled"}
                 disabled={!isEligibleWindows10}
               >
-                <RocketLaunchIcon className="h-5 w-5 mr-2" /> Trigger Migration
+                <RocketLaunchIcon className="h-5 w-5 mr-2" /> Trigger Migration (Demo)
               </MenuItem>
             </span>
           </Tooltip>
@@ -282,19 +261,19 @@ const AdminDeviceList = () => {
           <Tooltip
             content={
               needsReview
-                ? "Device requires manual review — email notification can be sent to the user."
-                : "Email option is only available if device status is 'Needs Review'."
+                ? "Demo: Device requires manual review — email notification can be sent to the user."
+                : "Demo: Email option is only available if device status is 'Needs Review'."
             }
             placement="left"
             className="bg-black text-white"
           >
-            <span> {/* Wrapper for tooltip on disabled item */}
+            <span>
               <MenuItem
                 onClick={() => sendEmail(device.deviceId)}
                 className={needsReview ? "" : "menu-disabled"}
                 disabled={!needsReview}
               >
-                <EnvelopeIcon className="h-5 w-5 mr-2" /> Send Email
+                <EnvelopeIcon className="h-5 w-5 mr-2" /> Send Email (Demo)
               </MenuItem>
             </span>
           </Tooltip>
@@ -303,19 +282,19 @@ const AdminDeviceList = () => {
           <Tooltip
             content={
               notCompatible
-                ? "Device is marked 'Not Compatible' — a request for a new device can be generated."
-                : "Service request available only for devices marked 'Not Compatible'."
+                ? "Demo: Device is not compatible — ServiceNow request can be created for manual review."
+                : "Demo: ServiceNow request option is only available if device status is 'Not Compatible'."
             }
             placement="left"
             className="bg-black text-white"
           >
-            <span> {/* Wrapper for tooltip on disabled item */}
+            <span>
               <MenuItem
                 onClick={() => generateServiceRequest(device)}
                 className={notCompatible ? "" : "menu-disabled"}
                 disabled={!notCompatible}
               >
-                <DocumentTextIcon className="h-5 w-5 mr-2" /> Generate Service Request
+                <DocumentTextIcon className="h-5 w-5 mr-2" /> Generate Service Request (Demo)
               </MenuItem>
             </span>
           </Tooltip>
@@ -336,18 +315,42 @@ const AdminDeviceList = () => {
 
   return (
     <>
-
       <NavbarComponent />
+      
+      {/* Demo Mode Banner */}
+      <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-6">
+        <div className="flex items-center justify-center">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-400">
+                <strong>Demo Mode Active:</strong> You are currently viewing the admin dashboard in demo mode. All data shown is mock data and no real actions will be performed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <main className="flex-1 flex flex-col items-center px-2 sm:px-4 py-6 w-full max-w-full overflow-x-hidden">
         {/* Login-style border wrapper start */}
-
         <div className="relative bg-gray-300 p-4 sm:p-8 md:p-10 rounded-3xl shadow-2xl w-full flex flex-col items-center max-w-full">
           <div className="relative w-full flex flex-col items-center mb-8">
             <h1 className="text-4xl font-extrabold mb-2 text-center text-black tracking-tight drop-shadow-[0_2px_16px_rgba(34,211,238,0.7)]">
-              Admin Dashboard
+              Admin Dashboard (Demo Mode)
             </h1>
-            <p className="text-black mb-2 text-lg">Welcome{adminEmail ? `, ${adminEmail}` : ', Admin'}!</p>
+            <p className="text-black mb-2 text-lg">Welcome{adminEmail ? `, ${adminEmail}` : ', Demo Admin'}!</p>
+            <button
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+            >
+              Exit Demo Mode
+            </button>
           </div>
+
           {/* Charts Section - original graphs, inside card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-8 max-w-full">
             {/* Migration Status Overview Chart */}
@@ -377,6 +380,7 @@ const AdminDeviceList = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+
             {/* Eligibility Status Chart */}
             <div className="rounded-xl w-full h-full content-center shadow-lg bg-gray-100 flex flex-col">
               <h2 className="text-xl font-semibold mt-2 text-center text-black">Eligibility Status</h2>
@@ -402,6 +406,7 @@ const AdminDeviceList = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+
             {/* Devices by OS Chart */}
             <div className="rounded-xl w-full h-full content-center shadow-lg bg-gray-100 flex flex-col">
               <h2 className="text-xl font-semibold mt-2 text-center text-black">Devices by OS</h2>
@@ -429,17 +434,19 @@ const AdminDeviceList = () => {
               </div>
             </div>
           </div>
+
           {/* Progress Bar Overlay - moved outside table */}
           {isLoading && (
             <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-[9999]">
               <div className="flex flex-col items-center w-[70vw]">
                 <Progress value={progress} size="md" label="Completed..." className="w-full" />
                 <Typography variant="small" className="mt-2 text-white">
-                  Loading, please wait...
+                  Demo: Loading, please wait... (This is a demo simulation)
                 </Typography>
               </div>
             </div>
           )}
+
           {/* Device Table with shadow */}
           <div className="rounded-xl w-full shadow-lg bg-white overflow-x-auto max-w-full">
             <Card className="w-full bg-gray-100 rounded-xl shadow flex flex-col">
@@ -447,10 +454,10 @@ const AdminDeviceList = () => {
                 <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
                   <div>
                     <Typography variant="h4" className="text-black font-bold">
-                      Device List
+                      Device List (Demo Data)
                     </Typography>
                     <Typography className="mt-1 font-normal text-gray-700">
-                      Manage all your devices
+                      Manage all your devices - Demo Mode
                     </Typography>
                   </div>
                 </div>
@@ -480,7 +487,7 @@ const AdminDeviceList = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardBody className="overflow-y-auto px-0 pt-0 bg-gray-100 " style={{ maxHeight: '60vh' }}>
+              <CardBody className="overflow-y-auto px-0 pt-0 bg-gray-100" style={{ maxHeight: '60vh' }}>
                 <div className="w-full overflow-x-auto">
                   <table className="w-full min-w-[700px] table-auto text-left">
                     <thead className="top-0 bg-cyan-200">
@@ -587,22 +594,15 @@ const AdminDeviceList = () => {
                 </div>
               </CardBody>
             </Card>
-
           </div>
         </div>
-
         {/* Login-style border wrapper end */}
       </main>
+      
       <Footer />
       <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar theme="colored" />
     </>
   );
 };
 
-const AdminDashboard = () => (
-  <ProtectedRoute role="admin">
-    <AdminDeviceList />
-  </ProtectedRoute>
-);
-
-export default AdminDashboard;
+export default DemoAdminDashboard;

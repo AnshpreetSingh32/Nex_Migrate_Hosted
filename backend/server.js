@@ -8,6 +8,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth.routes');
 const adminRoutes = require('./routes/admin.routes');
 const userRoutes = require('./routes/user.routes');
+const demoRoutes = require('./routes/demo.routes');
 
 
 
@@ -30,7 +31,7 @@ app.get('/cause-error', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
-
+app.use('/api/demo', demoRoutes);
 
 
 //basic error handling middleware

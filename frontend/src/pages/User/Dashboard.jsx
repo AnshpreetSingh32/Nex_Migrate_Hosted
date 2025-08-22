@@ -305,7 +305,7 @@ const UserDashboard = () => {
         </main>
         <Footer />
       </div>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar theme="colored" />
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar theme="colored" />
     </ProtectedRoute>
   );
 };
