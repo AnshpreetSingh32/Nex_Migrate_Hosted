@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
         reinstallRequired: DataTypes.BOOLEAN
     },
         {
-            timestamps: false
+            timestamps: false,
+            tableName: "applications"   // ✅ force lowercase table name
         });
 };

@@ -8,5 +8,9 @@ module.exports = (sequelize, DataTypes) => {
         status: DataTypes.STRING,
         message: DataTypes.STRING,
         createdAt: DataTypes.DATE
-    });
+    },
+{
+        timestamps: true,
+        tableName: "servicerequests"   // ✅ force lowercase table name
+});
 };

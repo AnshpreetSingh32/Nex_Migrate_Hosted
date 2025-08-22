@@ -9,18 +9,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        os_version: {
-            type: DataTypes.STRING
-        },
-        ram_gb: {
-            type: DataTypes.INTEGER
-        },
-        tpm_version: {
-            type: DataTypes.STRING
-        },
-        cpu_generation: {
-            type: DataTypes.STRING
-        },
+        os_version: DataTypes.STRING,
+        ram_gb: DataTypes.INTEGER,
+        tpm_version: DataTypes.STRING,
+        cpu_generation: DataTypes.STRING,
         isEligible: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
@@ -36,13 +28,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'users',
-                key: 'userId'
+                model: "users",   // ✅ must match user.model.js tableName
+                key: "userId"
             },
-            unique: true // <- this makes it a 1:1 relationship in the DB as well
+            unique: true
         }
     }, {
-        timestamps: true
+        timestamps: true,
+        tableName: "devices"   // ✅ force lowercase table name
     });
 
     return Device;

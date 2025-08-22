@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         timestamp: DataTypes.DATE
     },
         {
-            timestamps: false
+            timestamps: false,
+            tablename: "adminlogs"   // ✅ force lowercase table name
         });
 };

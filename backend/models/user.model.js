@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         }
     }, {
-        timestamps: true
+        timestamps: true,
+        tableName: "users"   // ✅ force lowercase table name
     });
 
     return User;

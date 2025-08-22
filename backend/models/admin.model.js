@@ -7,5 +7,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         email: DataTypes.STRING,
         password: DataTypes.STRING
-    });
+    }, 
+    {
+            timestamps: true,
+            tableName: "admins"   // ✅ force lowercase table name
+        });
 };
