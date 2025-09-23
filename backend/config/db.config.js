@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 
 module.exports = {
   HOST: process.env.DB_HOST,
@@ -10,7 +11,7 @@ module.exports = {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // ✅ Required for Railway SSL
+      rejectUnauthorized: false, // works without CA cert
     },
   },
 };
