@@ -116,8 +116,10 @@ const DemoUserDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    navigate('/login-user');
     toast.success('Logged out from demo mode');
+    setTimeout(() => {
+      navigate('/login-user');
+    }, 1200);
   };
 
   useEffect(() => {

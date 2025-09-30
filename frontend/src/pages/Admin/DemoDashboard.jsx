@@ -150,17 +150,17 @@ const DemoAdminDashboard = () => {
       setTimeout(async () => {
         // Show demo success message
         toast.success('Demo: Migration triggered successfully! (This is demo mode - no real migration occurred)');
-        
+
         // Update device status to show it was "migrated"
         setDevices(prevDevices => prevDevices.map(device =>
-          device.deviceId === deviceId 
-            ? { 
-                ...device, 
-                status: 'Migrated', 
-                migrationTriggered: true, 
-                isEligible: false,
-                os_version: 'Win11'
-              } 
+          device.deviceId === deviceId
+            ? {
+              ...device,
+              status: 'Migrated',
+              migrationTriggered: true,
+              isEligible: false,
+              os_version: 'Win11'
+            }
             : device
         ));
 
@@ -193,8 +193,10 @@ const DemoAdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login-admin');
     toast.success('Logged out from demo mode');
+    setTimeout(() => {
+      navigate('/login-admin');
+    }, 1200);
   };
 
   const handleTabChange = (value) => {
@@ -316,7 +318,7 @@ const DemoAdminDashboard = () => {
   return (
     <>
       <NavbarComponent />
-      
+
       {/* Demo Mode Banner */}
       <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-6">
         <div className="flex items-center justify-center">
@@ -598,7 +600,7 @@ const DemoAdminDashboard = () => {
         </div>
         {/* Login-style border wrapper end */}
       </main>
-      
+
       <Footer />
       <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar theme="colored" />
     </>
