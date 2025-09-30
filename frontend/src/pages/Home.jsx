@@ -90,6 +90,21 @@ const Home = () => {
   const howItWorksRef = useRef(null);
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    const warmupBackend = (retries = 3, delay = 5000) => {
+    fetch("https://nex-migrate-hosted.onrender.com/")
+      .then(res => res.text()) // ✅ parse as text
+      .then(data => console.log("Warmup success:", data))
+      .catch(err => {
+        console.error("Warmup failed:", err);
+        if (retries > 0) {
+          console.log(`Retrying warmup in ${delay / 1000}s...`);
+          setTimeout(() => warmupBackend(retries - 1, delay), delay);
+        }
+      });
+  };
+
+  warmupBackend(); // run on mount
   }, []);
 
   return (
