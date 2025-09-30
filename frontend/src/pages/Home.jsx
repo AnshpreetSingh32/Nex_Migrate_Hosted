@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
+import { getUserRole, getDemoMode } from '../utils/auth';
 import NavbarComponent from '../components/Common/Navbar';
 import Footer from '../components/Common/Footer';
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ParticlesBackground from '../components/Common/ParticlesBackground';
 import { Popover, PopoverHandler, PopoverContent, Typography } from "@material-tailwind/react";
 import { desc } from 'framer-motion/client';
@@ -86,6 +87,7 @@ const howItWorksDetails = [
 ];
 
 const Home = () => {
+  const howItWorksRef = useRef(null);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -117,20 +119,37 @@ const Home = () => {
           </motion.p>
           <motion.div className="flex justify-center gap-4 relative" initial="hidden" animate="visible" variants={stagger}>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                to="/login-user"
+              <button
+                type="button"
                 className="inline-flex items-center justify-center rounded-md bg-black px-7 py-2.5 text-base font-semibold text-white shadow-lg border border-white/20 transition-transform duration-150 hover:shadow-cyan-400/60 hover:ring-2 hover:ring-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                onClick={() => {
+                  if (howItWorksRef.current) {
+                    howItWorksRef.current.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
               >
                 Get Started
-              </Link>
+              </button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                to="/user/dashboard"
-                className="inline-flex items-center justify-center rounded-md bg-white px-7 py-2.5 text-base font-semibold text-black shadow-lg border border-black/20 transition-transform duration-150 hover:shadow-cyan-400/60 hover:ring-2 hover:ring-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
-              >
-                View Dashboard
-              </Link>
+              {(() => {
+                const role = getUserRole();
+                let dashboardPath = '/login-user';
+                const isDemo = getDemoMode();
+                if (role === 'admin') {
+                  dashboardPath = isDemo ? '/admin/demo-dashboard' : '/admin/dashboard';
+                } else if (role === 'user') {
+                  dashboardPath = isDemo ? '/user/demo-dashboard' : '/user/dashboard';
+                }
+                return (
+                  <Link
+                    to={dashboardPath}
+                    className="inline-flex items-center justify-center rounded-md bg-white px-7 py-2.5 text-base font-semibold text-black shadow-lg border border-black/20 transition-transform duration-150 hover:shadow-cyan-400/60 hover:ring-2 hover:ring-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                  >
+                    View Dashboard
+                  </Link>
+                );
+              })()}
             </motion.div>
           </motion.div>
         </motion.div>
@@ -153,57 +172,66 @@ const Home = () => {
           initial="hidden"
           animate="visible"
         >
-          {featureDetails.map((feature, idx) => (
-            <Popover key={idx}>
-              <PopoverHandler>
-                <motion.div
-                  className="relative bg-black border border-cyan-400/40 shadow-lg rounded-2xl px-7 py-10 flex flex-col items-center justify-center text-white overflow-hidden group "
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.16, delay: idx * 0.06, type: 'spring', stiffness: 800, damping: 38 }}
-                  whileHover={{ scale: 1.035 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <div className="mb-4 flex items-center justify-center">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-lg font-bold mb-2 text-white tracking-tight">
-                    {feature.title}
-                  </h3>
-                  <p className="text-cyan-100 font-medium text-sm">
-                    {feature.desc}
-                  </p>
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-cyan-400/30 rounded-full" />
-                </motion.div>
-              </PopoverHandler>
-              <PopoverContent className="z-[999] grid w-[36rem] grid-cols-1 sm:grid-cols-2 sm:w-[36rem] w-full overflow-hidden p-0 bg-black/80 border border-cyan-400/50 shadow-[0_0_12px_2px_#06b6d4] rounded-lg">
-                <div className="p-4">
-                  <Typography color="white" className="mb-2 text-lg font-bold underline">
-                    {feature.title2}
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="cyan-100"
-                    className="mb-14 font-normal text-cyan-100"
+          {featureDetails.map((feature, idx) => {
+            const [isOpen, setIsOpen] = useState(false);
+            return (
+              <Popover key={idx}
+                open={isOpen}
+                handler={() => setIsOpen(!isOpen)}
+                dismiss={{ onClickOutside: () => setIsOpen(false) }}
+              >
+                <PopoverHandler>
+                  <motion.div
+                    className="relative bg-black border border-cyan-400/40 shadow-lg rounded-2xl px-7 py-10 flex flex-col items-center justify-center text-white overflow-hidden group "
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.16, delay: idx * 0.06, type: 'spring', stiffness: 800, damping: 38 }}
+                    whileHover={{ scale: 1.035 }}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    {feature.desc2}
-                  </Typography>
-                </div>
-                <div className="min-h-full !w-full p-3 flex items-center justify-center bg-cyan-400/10">
-                  <img
-                    src={feature.image}
-                    alt="feature image"
-                    className="h-fit w-full rounded-lg object-cover shadow-[0_0_8px_2px_#06b6d4]"
-                  />
-                </div>
-              </PopoverContent>
-            </Popover>
-          ))}
+                    <div className="mb-4 flex items-center justify-center">
+                      {feature.icon}
+                    </div>
+                    <h3 className="text-lg font-bold mb-2 text-white tracking-tight">
+                      {feature.title}
+                    </h3>
+                    <p className="text-cyan-100 font-medium text-sm">
+                      {feature.desc}
+                    </p>
+                    {isOpen && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-cyan-400/50 rounded-full" />
+                    )}
+                  </motion.div>
+                </PopoverHandler>
+                <PopoverContent className="z-[999] grid w-[36rem] grid-cols-1 sm:grid-cols-2 sm:w-[36rem] w-full overflow-hidden p-0 bg-black/80 border border-cyan-400/50 shadow-[0_0_12px_2px_#06b6d4] rounded-lg">
+                  <div className="p-4">
+                    <Typography color="white" className="mb-2 text-lg font-bold underline">
+                      {feature.title2}
+                    </Typography>
+                    <Typography
+                      variant="small"
+                      color="cyan-100"
+                      className="mb-14 font-normal text-cyan-100"
+                    >
+                      {feature.desc2}
+                    </Typography>
+                  </div>
+                  <div className="min-h-full !w-full p-3 flex items-center justify-center bg-cyan-400/10">
+                    <img
+                      src={feature.image}
+                      alt="feature image"
+                      className="h-fit w-full rounded-lg object-cover shadow-[0_0_8px_2px_#06b6d4]"
+                    />
+                  </div>
+                </PopoverContent>
+              </Popover>
+            );
+          })}
         </motion.div>
       </section>
 
       {/* Workflow Snapshot */}
-      <section className="py-20 px-4 bg-black text-center">
+  <section ref={howItWorksRef} className="py-20 px-4 bg-black text-center">
         <motion.h2
           className="text-4xl md:text-5xl font-extrabold mb-4 text-white"
           initial="hidden"
@@ -219,54 +247,63 @@ const Home = () => {
           initial="hidden"
           animate="visible"
         >
-          {howItWorksDetails.map((step, idx) => (
-            <Popover key={idx}>
-              <PopoverHandler>
-                <motion.div
-                  className="relative bg-white border border-cyan-400/40 shadow-lg rounded-2xl px-7 py-10 flex flex-col items-center justify-center text-black overflow-hidden group"
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.16, delay: idx * 0.06, type: 'spring', stiffness: 800, damping: 38 }}
-                  whileHover={{ scale: 1.035 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <div className="mb-4 flex items-center justify-center">
-                    <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-cyan-400/20 border border-cyan-400 text-cyan-500 text-2xl font-extrabold shadow-[0_0_8px_0_#06b6d4]">
-                      {idx + 1}
-                    </span>
-                  </div>
-                  <h4 className="text-lg font-bold mb-2 text-black tracking-tight">
-                    {step.title}
-                  </h4>
-                  <p className="text-gray-700 font-medium text-sm">
-                    {step.desc}
-                  </p>
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-cyan-400/30 rounded-full" />
-                </motion.div>
-              </PopoverHandler>
-              <PopoverContent className="z-[999] grid w-[36rem] grid-cols-1 sm:grid-cols-2 sm:w-[36rem] w-full overflow-hidden p-0 bg-white/80 border border-cyan-400/50 shadow-[0_0_12px_2px_#06b6d4] rounded-lg">
-                <div className="p-4">
-                  <Typography color="black" className="mb-2 text-lg font-bold underline">
-                    {step.title2}
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="gray-700"
-                    className="mb-14 font-normal text-gray-700"
+          {howItWorksDetails.map((step, idx) => {
+            const [isOpen, setIsOpen] = useState(false);
+            return (
+              <Popover key={idx}
+                open={isOpen}
+                handler={() => setIsOpen(!isOpen)}
+                dismiss={{ onClickOutside: () => setIsOpen(false) }}
+              >
+                <PopoverHandler>
+                  <motion.div
+                    className="relative bg-white border border-cyan-400/40 shadow-lg rounded-2xl px-7 py-10 flex flex-col items-center justify-center text-black overflow-hidden group"
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.16, delay: idx * 0.06, type: 'spring', stiffness: 800, damping: 38 }}
+                    whileHover={{ scale: 1.035 }}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    {step.desc2}
-                  </Typography>
-                </div>
-                <div className="min-h-full !w-full p-3 flex items-center justify-center bg-cyan-400/10">
-                  <img
-                    src={step.image}
-                    alt="step image"
-                    className="h-fit w-full rounded-lg object-cover shadow-[0_0_8px_2px_#06b6d4]"
-                  />
-                </div>
-              </PopoverContent>
-            </Popover>
-          ))}
+                    <div className="mb-4 flex items-center justify-center">
+                      <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-cyan-400/20 border border-cyan-400 text-cyan-500 text-2xl font-extrabold shadow-[0_0_8px_0_#06b6d4]">
+                        {idx + 1}
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-bold mb-2 text-black tracking-tight">
+                      {step.title}
+                    </h4>
+                    <p className="text-gray-700 font-medium text-sm">
+                      {step.desc}
+                    </p>
+                    {isOpen && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-cyan-400/70 rounded-full" />
+                    )}
+                  </motion.div>
+                </PopoverHandler>
+                <PopoverContent className="z-[999] grid w-[36rem] grid-cols-1 sm:grid-cols-2 sm:w-[36rem] w-full overflow-hidden p-0 bg-white/80 border border-cyan-400/50 shadow-[0_0_12px_2px_#06b6d4] rounded-lg">
+                  <div className="p-4">
+                    <Typography color="black" className="mb-2 text-lg font-bold underline">
+                      {step.title2}
+                    </Typography>
+                    <Typography
+                      variant="small"
+                      color="gray-700"
+                      className="mb-14 font-normal text-gray-700"
+                    >
+                      {step.desc2}
+                    </Typography>
+                  </div>
+                  <div className="min-h-full !w-full p-3 flex items-center justify-center bg-cyan-400/10">
+                    <img
+                      src={step.image}
+                      alt="step image"
+                      className="h-fit w-full rounded-lg object-cover shadow-[0_0_8px_2px_#06b6d4]"
+                    />
+                  </div>
+                </PopoverContent>
+              </Popover>
+            );
+          })}
         </motion.div>
       </section>
 

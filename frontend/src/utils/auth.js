@@ -7,7 +7,7 @@ export const removeToken = () => localStorage.removeItem('token');
 export const isTokenValid = () => {
   const token = getToken();
   if (!token) return false;
-
+  
   try {
     const { exp } = jwtDecode(token);
     return Date.now() < exp * 1000;
@@ -26,3 +26,14 @@ export const getUserRole = () => {
     return null;
   }
 };
+
+  export const getDemoMode = () => {
+    const token = getToken();
+    if (!token) return false;
+    try {
+      const decoded = jwtDecode(token);
+      return Boolean(decoded.demo);
+    } catch (e) {
+      return false;
+    }
+  };

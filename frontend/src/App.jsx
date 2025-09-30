@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import AdminDeviceList from './pages/Admin/Dashboard';
 import DemoDashboard from './pages/Admin/DemoDashboard';
+import ProtectedDemoRoute from './components/Common/ProtectedDemoRoute';
 import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AboutPage from './components/Common/About';
@@ -25,13 +26,21 @@ function App() {
               <AdminDeviceList />
             </ProtectedRoute>
           } />
-        <Route path="/admin/demo-dashboard" element={<DemoDashboard />} />
+        <Route path="/admin/demo-dashboard" element={
+          <ProtectedDemoRoute role="admin">
+            <DemoDashboard />
+          </ProtectedDemoRoute>
+        } />
         <Route path="/user/dashboard" element={
             <ProtectedRoute role="user">
               <UserDashboard />
             </ProtectedRoute>
           } />
-        <Route path="/user/demo-dashboard" element={<DemoUserDashboard />} />
+        <Route path="/user/demo-dashboard" element={
+          <ProtectedDemoRoute role="user">
+            <DemoUserDashboard />
+          </ProtectedDemoRoute>
+        } />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/privacy-policy" element={<Privacypolicy />} />

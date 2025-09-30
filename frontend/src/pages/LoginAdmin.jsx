@@ -77,16 +77,22 @@ function LoginAdmin() {
       // Simulate a brief delay to show loading state
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Create a mock token for demo mode
-      const mockToken = btoa(JSON.stringify({
+      // Create a mock JWT token for demo mode
+      const header = { alg: 'HS256', typ: 'JWT' };
+      const payload = {
         id: 'demo-admin-id',
         email: demoCredentials.email,
         role: 'admin',
-        demo: true
-      }));
-      
+        demo: true,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 // 1 hour expiry
+      };
+      function base64url(source) {
+        return btoa(JSON.stringify(source)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+      }
+      const mockToken = `${base64url(header)}.${base64url(payload)}.demo-signature`;
       // Save the demo token
       saveToken(mockToken);
+      console.log('Demo token saved:', mockToken);
       
       // Navigate to demo dashboard
       navigate('/admin/demo-dashboard');

@@ -10,7 +10,7 @@ import {
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/Nex_Migtrate image.png";
-import { getUserRole } from '../../utils/auth';
+import { getUserRole, getDemoMode } from '../../utils/auth';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 
@@ -175,8 +175,15 @@ const NavbarComponent = ({ children }) => {
                         className="inline-flex items-center justify-center px-6 py-2 text-base font-semibold border border-cyan-600 rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 shadow bg-cyan-600 hover:bg-cyan-700"
                         style={{ minWidth: '150px' }}
                         onClick={() => {
-                          if (userRole === 'admin' && window.location.pathname !== '/admin/dashboard') window.location.assign('/admin/dashboard');
-                          if (userRole === 'user' && window.location.pathname !== '/user/dashboard') window.location.assign('/user/dashboard');
+                          const isDemo = getDemoMode();
+                          if (userRole === 'admin') {
+                            const target = isDemo ? '/admin/demo-dashboard' : '/admin/dashboard';
+                            if (window.location.pathname !== target) window.location.assign(target);
+                          }
+                          if (userRole === 'user') {
+                            const target = isDemo ? '/user/demo-dashboard' : '/user/dashboard';
+                            if (window.location.pathname !== target) window.location.assign(target);
+                          }
                         }}
                       >
                         {userRole === 'admin' ? 'Go to Admin Dashboard' : 'Go to User Dashboard'}
