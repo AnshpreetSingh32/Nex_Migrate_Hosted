@@ -208,6 +208,7 @@ const NavbarComponent = ({ children }) => {
                 <button
                   onClick={() => {
                     localStorage.removeItem("token");
+                    localStorage.removeItem('userId');
                     toast.success('Logged out successfully!');
                     setTimeout(() => {
                       window.location.assign("/");
