@@ -1,7 +1,13 @@
 const db = require('../models');
 const { Device, ServiceRequest, MigrationLog, Application, User, AdminLog } = db;
+const { Resend } = require('resend');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+
 
 // Fetch all critical devices
 exports.getCriticalDevices = async (req, res) => {
@@ -104,65 +110,46 @@ exports.createServiceNowRequest = async (req, res) => {
 
 // Add logic for sending email
 exports.sendEmail = async (req, res) => {
-  const { deviceId , adminId} = req.body;
+  const { deviceId, adminId } = req.body;
 
   try {
     const device = await Device.findByPk(deviceId);
-
     if (!device || device.status !== 'Needs Review') {
       return res.status(400).json({ message: 'Device is not eligible for email action' });
     }
 
-    // Fetch user associated with the device
     const user = await User.findByPk(device.userId);
     if (!user || !user.email) {
       return res.status(404).json({ message: 'User or email not found for this device' });
     }
 
-    // Check if an email has already been sent for this device in AdminLog
     const existingLog = await AdminLog.findOne({
-      where: {
-        action: `Email sent to userId ${user.userId} for deviceId ${device.deviceId}`
-      }
+      where: { action: `Email sent to userId ${user.userId} for deviceId ${device.deviceId}` }
     });
     if (existingLog) {
       return res.status(409).json({ message: 'Email has already been sent for this device.' });
     }
 
-    // Setup transporter
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: 'anshpreetsingh3232@gmail.com', // Replace with your project email
-        pass: process.env.EMAIL_PASSWORD,             // Use app password or env var
-      },
-    });
-
-    const mailOptions = {
-      from: '"Nex-Migrate Support" <anshpreetsingh3232@gmail.com>',
+    // ✅ Send email using Resend API
+    await resend.emails.send({
+      from: 'Nex-Migrate Support <onboarding@resend.dev>',
       to: user.email,
       subject: 'Action Required: Your Device Needs Review for Windows 11 Migration',
       html: `
         <div style="font-family: Arial, sans-serif; font-size: 15px; color: #333;">
           <h2 style="color: #2e6cb8;">Windows 11 Migration Review Required</h2>
           <p>Hi ${user.name || 'User'},</p>
-          <p>Our system has flagged your device <strong>${device.device_name}</strong> as <strong>needing review</strong> for the upcoming Windows 11 migration.</p>
-          <p>Please visit the <strong>TechHub</strong> desk with your laptop between <strong>9:00 AM to 5:00 PM</strong> (Monday to Friday) for further assistance and evaluation.</p>
-          <p>This step is essential to ensure your device meets all compatibility requirements before migration.</p>
-          <br>
-          <p>Thank you,</p>
-          <p style="color: #888;">Nex-Migrate Support Team</p>
+          <p>Your device <strong>${device.device_name}</strong> needs review for the upcoming Windows 11 migration.</p>
+          <p>Please visit <strong>TechHub</strong> between <strong>9:00 AM - 5:00 PM</strong> (Mon–Fri) for assistance.</p>
+          <br><p>Thank you,<br><span style="color:#888;">Nex-Migrate Support Team</span></p>
         </div>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-
-    // Log the email sent action in AdminLog
     await AdminLog.create({
       action: `Email sent to userId ${user.userId} for deviceId ${device.deviceId}`,
       timestamp: new Date(),
-      adminId: adminId // Assuming adminId is passed in the request body
+      adminId,
     });
 
     res.json({ message: 'Email sent successfully to the user', email: user.email });
