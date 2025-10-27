@@ -1,6 +1,7 @@
 const db = require('../models');
 const { Device, ServiceRequest, MigrationLog, Application, User, AdminLog } = db;
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 // Fetch all critical devices
 exports.getCriticalDevices = async (req, res) => {
@@ -133,7 +134,7 @@ exports.sendEmail = async (req, res) => {
       service: 'Gmail',
       auth: {
         user: 'anshpreetsingh3232@gmail.com', // Replace with your project email
-        pass: 'iwsedhjihjhiaxam',             // Use app password or env var
+        pass: process.env.EMAIL_PASSWORD,             // Use app password or env var
       },
     });
 
